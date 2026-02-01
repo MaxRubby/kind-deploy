@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: drl-scheduler-remote
+  namespace: kube-system
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: drl-scheduler-remote
+  namespace: kube-system
+  annotations:
+    kubernetes.io/service-account.name: drl-scheduler-remote
+type: kubernetes.io/service-account-token
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: drl-scheduler-remote
+rules:
+# 保留原有的Pod和Node相关权限
+- apiGroups: [""]
+  resources: ["pods", "pods/binding", "nodes", "pods/status", "events"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: [""]
+  resources: ["namespaces"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["events.k8s.io"]
+  resources: ["events"]
+  verbs: ["create", "patch", "update"]
+# 添加Deployment相关权限
+- apiGroups: ["apps"]
+  resources: ["deployments", "deployments/status", "deployments/scale"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+# 添加ReplicaSet相关权限（Deployment会自动创建ReplicaSet）
+- apiGroups: ["apps"]
+  resources: ["replicasets", "replicasets/status", "replicasets/scale"]
+  verbs: ["get", "list", "watch"]
+# 添加其他可能需要的资源权限
+- apiGroups: [""]
+  resources: ["services", "endpoints", "configmaps", "secrets"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: drl-scheduler-remote
+subjects:
+- kind: ServiceAccount
+  name: drl-scheduler-remote
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: drl-scheduler-remote
+  apiGroup: rbac.authorization.k8s.io

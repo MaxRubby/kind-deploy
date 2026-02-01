@@ -1,0 +1,63 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: cluster-a10-02
+networking:
+  ipFamily: ipv4
+nodes:
+  - role: control-plane
+    kubeadmConfigPatches:
+    - |
+      kind: InitConfiguration
+      nodeRegistration:
+        kubeletExtraArgs:
+          node-labels: "ingress-ready=true"
+    - |
+      kind: ClusterConfiguration
+      apiServer:
+        extraArgs:
+          bind-address: "0.0.0.0"
+        certSANs:
+        - "0.0.0.0"
+        - "127.0.0.1"
+        - "localhost"
+    extraPortMappings:
+    # API Server 端口映射，监听所有接口
+    - containerPort: 6443
+      hostPort: 6442
+      listenAddress: "0.0.0.0"
+      protocol: TCP
+    # 预留 30000-30010 的端口范围供 NodePort 服务使用
+    - containerPort: 30000
+      hostPort: 30100
+      protocol: TCP
+    - containerPort: 30001
+      hostPort: 30101
+      protocol: TCP
+    - containerPort: 30002
+      hostPort: 30102
+      protocol: TCP
+    - containerPort: 30003 
+      hostPort: 30103
+      protocol: TCP
+    - containerPort: 30004
+      hostPort: 30104
+      protocol: TCP
+    - containerPort: 30005
+      hostPort: 30105
+      protocol: TCP
+    - containerPort: 30006
+      hostPort: 30106
+      protocol: TCP
+    - containerPort: 30007
+      hostPort: 30107
+      protocol: TCP
+    - containerPort: 30008
+      hostPort: 30108
+      protocol: TCP
+    - containerPort: 30009
+      hostPort: 30109
+      protocol: TCP
+    - containerPort: 30010
+      hostPort: 30110
+      protocol: TCP
+  - role: worker
