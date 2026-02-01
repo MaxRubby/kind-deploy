@@ -64,5 +64,3 @@ A: 运行以下命令删除所有集群：
    kind delete clusters hub-cluster-a10 cluster-a10-01 cluster-a10-02
    ```
 
-## 📄 授权
-MIT License
